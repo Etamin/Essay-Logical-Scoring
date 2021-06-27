@@ -1,3 +1,4 @@
+from openie import StanfordOpenIE
 import os
 import sys
 import spacy
@@ -7,7 +8,11 @@ from nltk.parse import stanford
 from nltk.parse.stanford import StanfordParser
 
 from nltk.tree import ParentedTree, Tree
+from numpy import *
 
+import warnings
+
+warnings.filterwarnings('ignore')
 java_path = "C:/Program Files/Java/jdk-11.0.11/bin/java.exe"
 os.environ['JAVAHOME'] = java_path
 os.environ['STANFORD_PARSER'] = './model/stanford-parser.jar'
@@ -62,9 +67,10 @@ if __name__ =="__main__":
     path=sys.argv[1]
     files= os.listdir(path)
     list1 = []
+    rate=[]
     for file in files:
         if not os.path.isdir(file):
-            f = open(path+"/"+file)
+            f = open(path+"/"+file,'r',encoding='utf-8')
             content=f.read()
             content=content.replace('\n', '').replace('\r', '')
             doc = nlp(content)
@@ -78,7 +84,7 @@ if __name__ =="__main__":
                 for word in sentence:  
                     # print(word)
                     
-                    if str(word.tag_) in ['NN','NNS','NNP','NNPS','VBG','WP']:
+                    if str(word.tag_) in ['NN','NNS','NNP','NNPS','WP']:
                         # print(word, word.tag_)
                         wordinsent.add(word.text)
                         # wordvecinset.add(word)
@@ -96,4 +102,5 @@ if __name__ =="__main__":
                         # print(wd1.text+" "+wd2.text)
                         rel[wd1.text].add(wd2.text)
                         rel[wd2.text].add(wd1.text)
-            print((bfs(rel)/len(rel)))
+            rate.append((bfs(rel)/len(rel)))
+    print("Avg:"+str(mean(rate)))
